@@ -4,36 +4,55 @@
 # step 3. repeat step 2 for the 2 new line segments
 # step 4. repeat step 3 until no points are left
 # step 5. terminate the algorithm 
+
 import math
-
-
-
-def findMaxDistance(min_x,max_x,sub_points):
-    # Equation to find left / right side of line = (x2-x1).(y3-y1)-(y2-y1).(x3-x1)
+def findMaxDistance(min_x,max_x,side):
     # Distance equation = |(x2-x1).(y3-y1)-(y2-y1).(x3-x1)| / sqrt((x2-x1)^2 + (y2-y1)^2)
-    # The equation to use = |(min_x[0]-i[0]).(max_x[1]-i[1])-(min_x[1]-i[1]).(max_x[0]-i[0])| / sqrt((min_x[1]-i[0])^2 + (min_x[1]-i[1])^2)
-    global points
-    global convex_hull
     current_max_distance = 0
-    set_of_points = None
-    for i in sub_points:
-        distance = abs((max_x[0] - min_x[0]) * (i[1] - min_x[1]) - (max_x[1] - min_x[1]) * (i[0] - min_x[0])) / math.sqrt((max_x[0] - min_x[0])**2 + (max_x[1] - min_x[1])**2)
-        if distance > current_max_distance: 
-            current_max_distance = distance
-            set_of_points = i
+    point = 0
+    for i in side:
+            distance = abs((max_x[0] - min_x[0]) * (i[1] - min_x[1]) - (max_x[1] - min_x[1]) * (i[0] - min_x[0])) / math.sqrt((max_x[0] - min_x[0])**2 + (max_x[1] - min_x[1])**2)
+            if distance >= current_max_distance: 
+                current_max_distance = distance
+                point = i
+    side.remove(point)
+    convex_hull.append(point) 
+        
+    return point, side
 
-    sub_points.remove(set_of_points),points.remove(set_of_points)
-    convex_hull.append(set_of_points)
+def split_set(min_x,max_x,set):
+    subset = []
+    for i in set:
+        if ((max_x[0] - min_x[0]) * (i[1] - min_x[1]) - (max_x[1] - min_x[1]) * (i[0] - min_x[0])) > 0:
+            subset.append(i)
+    return subset 
 
-    return set_of_points
+def findConvexHull(points,min_x,max_x):
+    current_node = 0
+    if len(points) == 1:
+        convex_hull.append(points[0])
+        return convex_hull
 
-# initial points, no importance
-points = [(0,0), (3,0), (3,3), (0,3), (1,1), (2,2)]
+    # if the subsets are empty, return the convex hull - Base case
+    print("Points: ",len(points))
+    if len(points) == 0:
+        return convex_hull
+    else:    
+        current_node,subset = findMaxDistance(min_x,max_x,points)
+        first_subset = split_set(min_x,current_node,points)
+        findConvexHull(first_subset,min_x,current_node)
+
+        second_subset = split_set(current_node,max_x,points)
+        findConvexHull(second_subset,current_node,max_x)
+
+
+points = [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)]
+
+left_side = []
+right_side = []
 convex_hull = []
 min_x = points[0]
 max_x = points[-1]
-left_side = []
-right_side = []
 
 # finding the min and max x values
 for i in points:
@@ -45,39 +64,16 @@ convex_hull.append(min_x)
 convex_hull.append(max_x)
 points.remove(min_x)
 points.remove(max_x)
-    # Equation to find left and the right side of line = (x2-x1).(y3-y1)-(y2-y1).(x3-x1)
-    # Distance equation = |(x2-x1).(y3-y1)-(y2-y1).(x3-x1)| / sqrt((x2-x1)^2 + (y2-y1)^2)
+
 for i in points:
-        # positive score means it is the left side, else right side
     if ((max_x[0] - min_x[0]) * (i[1] - min_x[1]) - (max_x[1] - min_x[1]) * (i[0] - min_x[0])) > 0:
         left_side.append(i)
-    else:
+    elif ((max_x[0] - min_x[0]) * (i[1] - min_x[1]) - (max_x[1] - min_x[1]) * (i[0] - min_x[0])) < 0:
         right_side.append(i)
-if len(left_side) != 0:
-        point1 = findMaxDistance(min_x,max_x,left_side)
-if len(right_side) != 0:
-        point2 = findMaxDistance(min_x,max_x,right_side)
+findConvexHull(left_side,min_x,max_x)
+findConvexHull(right_side,max_x,min_x)
+print("Convex Hull: ",convex_hull) 
+# expected [(0, 0), (0, 3), (3, 1), (4, 4)]
+# output   [(0, 3), (4, 4), (0, 0), (3, 3), (3, 1), (2, 2)]
 
-
-
-
-def findConvexHull(points,min_x,max_x):
-    global convex_hull
-    left_side = []
-    for i in points:
-        # positive score means it is the left side, else right side
-        if ((max_x[0] - min_x[0]) * (i[1] - min_x[1]) - (max_x[1] - min_x[1]) * (i[0] - min_x[0])) > 0:
-            left_side.append(i)
-    if len(left_side) == 0:
-        return convex_hull
-    else:
-        current_node = findMaxDistance(min_x,max_x,left_side)
-    findConvexHull(points,min_x,current_node)
-    findConvexHull(points,current_node,max_x)
-
-
-
-
-
-answer = findConvexHull(points,min_x,max_x)
-print(convex_hull)
+# points = [(0,3),(1,1),(2,2),(4,4),(0,0),(1,2),(3,1),(3,3)]
