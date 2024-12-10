@@ -96,4 +96,3 @@ end for
 # recursively find convex hull points for left and right subset
 call findConvexHull(left_side, min_x, max_x)
 call findConvexHull(right_side, max_x, min_x)
-
