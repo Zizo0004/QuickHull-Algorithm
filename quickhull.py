@@ -6,6 +6,7 @@
 # step 5. terminate the algorithm 
 
 import math
+# finding the max distance between the line segments of min and max x and the remaining points.
 def findMaxDistance(min_x,max_x,side):
     # Distance equation = |(x2-x1).(y3-y1)-(y2-y1).(x3-x1)| / sqrt((x2-x1)^2 + (y2-y1)^2)
     current_max_distance = 0
@@ -45,16 +46,15 @@ def findConvexHull(points,min_x,max_x):
         second_subset = split_set(current_node,max_x,points)
         findConvexHull(second_subset,current_node,max_x)
 
-
+# Initalization step of the code. Min x and max x points are found, and the set of points are split into left and right subsets.
 points = [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)]
-
 left_side = []
 right_side = []
 convex_hull = []
-min_x = points[0]
+min_x = points[0] # random value s 
 max_x = points[-1]
 
-# finding the min and max x values
+# find the min x and max x based on the inital set of points
 for i in points:
     if i[0] < min_x[0]:
         min_x = i
@@ -70,10 +70,7 @@ for i in points:
         left_side.append(i)
     elif ((max_x[0] - min_x[0]) * (i[1] - min_x[1]) - (max_x[1] - min_x[1]) * (i[0] - min_x[0])) < 0:
         right_side.append(i)
+
+# recursively find convex hull points for left and right subset
 findConvexHull(left_side,min_x,max_x)
 findConvexHull(right_side,max_x,min_x)
-print("Convex Hull: ",convex_hull) 
-# expected [(0, 0), (0, 3), (3, 1), (4, 4)]
-# output   [(0, 3), (4, 4), (0, 0), (3, 3), (3, 1), (2, 2)]
-
-# points = [(0,3),(1,1),(2,2),(4,4),(0,0),(1,2),(3,1),(3,3)]

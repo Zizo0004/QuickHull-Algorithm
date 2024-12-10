@@ -5,7 +5,8 @@ class TestQuickhull(unittest.TestCase):
     def test1_quickhull(self):
         points = [(0,0), (1,1), (2,2), (1,2), (2,0)]
         expected = {(0,0), (2,0), (2,2), (1,2)}
-        result = set(quickhull.findConvexHull(points,(0,0),(2,0)))
+        left_side = set(quickhull.findConvexHull(points,(0,0),(2,0)))
+        right_side = set(quickhull.findConvexHull(points,(2,0),(0,0)))
         self.assertEqual(result, expected)
     def test_case_2(self):
         points = [(1,1), (3,1), (2,2), (2,0)]
